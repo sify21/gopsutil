@@ -5,10 +5,10 @@ package disk
 import (
 	"bytes"
 	"context"
-	"unsafe"
-
 	"github.com/shirou/gopsutil/internal/common"
 	"golang.org/x/sys/windows"
+	"strings"
+	"unsafe"
 )
 
 var (
@@ -35,6 +35,7 @@ type Win32_PerfFormattedData struct {
 type win32_DiskDrive struct {
 	DeviceID     string
 	SerialNumber string
+	Model        string
 }
 type win32_DiskPartition struct {
 	DeviceID string
@@ -195,5 +196,5 @@ func GetDiskSerialNumberWithContext(ctx context.Context, name string) string {
 	if err != nil || len(diskDrive) <= 0 {
 		return ""
 	}
-	return diskDrive[0].SerialNumber
+	return strings.Replace(strings.TrimSpace(diskDrive[0].Model), " ", "_", -1) + "_" + strings.TrimSpace(diskDrive[0].SerialNumber)
 }
